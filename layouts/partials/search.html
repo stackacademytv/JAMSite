@@ -1,0 +1,103 @@
+
+<style media="screen">
+
+  .nav {
+    overflow: visible;
+    padding: 0.1rem;
+  }
+
+  #search {
+    float: right;
+    position: relative;
+    bottom: 0.2rem;
+    padding: 0.5rem 1rem;
+    width: 15rem;
+    border: 1px solid lightgray;
+  }
+
+  #search-results {
+    position: absolute;
+    background: white;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.35);
+    right: 0;
+  }
+
+  #search-results a {
+    display: block;
+    border-bottom: 1px solid lightgray;
+    width: 12rem;
+    padding: 0.5rem;
+    font-weight: bold;
+  }
+
+  #search-results a:hover {
+    background-color: dodgerblue;
+    color: white;
+  }
+
+  #search-results.hide {
+    display: none;
+  }
+
+</style>
+
+<input type="text" id="search" placeholder="Search">
+<div id="search-results" class="hide"></div>
+
+<script src="https://unpkg.com/lunr/lunr.js"></script>
+<script>
+
+  const search = document.getElementById('search')
+  const results = document.getElementById('search-results')
+
+  // Show results only on focus
+  search.addEventListener( 'focus', e => {
+    results.classList.remove('hide')
+  })
+  search.addEventListener( 'blur', e => {
+    setTimeout( () => {
+      results.classList.add('hide')
+    }, 100)
+  })
+
+  // Add results to HTML
+  search.addEventListener( 'keyup', function() {
+
+    results.innerHTML = ''
+    if( !this.value ) return
+
+    // Perform search from input value
+    let lunrResults = window.idx.search( this.value )
+
+    lunrResults.forEach( page => {
+
+      // Get refs
+      let pageMeta = page.ref.split('||')
+      let pageLink = document.createElement('a')
+      pageLink.innerText = pageMeta[0]
+      pageLink.href = pageMeta[1]
+      results.appendChild( pageLink )
+    })
+  })
+
+  // Fetch search index
+  fetch( '/index.json' ).then( res => {
+
+    // Parse JSON
+    res.json().then( searchIndex => {
+
+      // Build Lunr index
+      window.idx = lunr(function () {
+
+        // Define Lunr fields and refs
+        this.ref('meta')
+        this.field('title')
+        this.field('content')
+
+        searchIndex.forEach( page => this.add(page) )
+      })
+
+    })
+  })
+
+</script>

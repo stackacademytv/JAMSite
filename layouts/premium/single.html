@@ -1,0 +1,95 @@
+{{ define "main" }}
+
+<style media="screen">
+
+  #signin {
+    background: #DEDEDE;
+    border-radius: 5px;
+    padding: 1rem;
+  }
+
+  #signin input, #signin button {
+    display: block;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    font-size: 1.25rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    outline: none;
+    border: none;
+  }
+
+  #signin button {
+    background: dodgerblue;
+    color: white;
+  }
+
+</style>
+
+<main>
+	<div class="post">
+		{{ partial "single/post-info.html" . }}
+		{{ partial "single/title.html" . }}
+
+		{{ partial "single/header.html" . }}
+
+		<div class="premium-content">
+
+			<h2 style="text-align:center;">Sign in to view premium content.</h2>
+			<form id="signin">
+				<input type="text" name="username" placeholder="username" value="">
+				<input type="password" name="password" placeholder="password" value="">
+				<button type="submit" name="button">Sign In</button>
+			</form>
+
+		</div>
+
+		{{ partial "single/footer.html" . }}
+	</div>
+
+	<div class="pagination">
+		{{- if .PrevPage }}
+		<a href="{{ .PrevPage.RelPermalink }}" class="left arrow">&#8592;</a>
+		{{- end }}
+		{{- if .NextPage }}
+		<a href="{{ .NextPage.RelPermalink }}" class="right arrow">&#8594;</a>
+		{{- end }}
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+<script>
+
+	// Cloud function URL
+	const cfURL = 'https://us-central1-tonal-bloom-269413.cloudfunctions.net/premium-content-loader'
+
+	// Handle signin
+	document.getElementById('signin').addEventListener( 'submit', function(e) {
+
+		// Prevent submission
+		e.preventDefault()
+
+		// Get credentials
+		let username = this.querySelector('[name="username"]').value
+		let password = this.querySelector('[name="password"]').value
+
+		// Perform auth
+		fetch( `${cfURL}?username=${username}&password=${password}` ).then( res => {
+
+			// Check for 200 response
+			if (res.ok) {
+				res.text().then( content => {
+
+					// Show premium content
+					this.innerHTML = content
+				})
+			}
+		})
+
+		return false
+	})
+
+</script>
+
+{{ end }}

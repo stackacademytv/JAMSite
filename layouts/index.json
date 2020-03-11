@@ -1,0 +1,10 @@
+[
+{{- range $i, $e := .Site.RegularPages -}}
+  {{ cond (eq $i 0) "" "," }}
+  {
+    "meta":"{{.Title}}||{{.URL}}",
+    "title":"{{.Title}}",
+    "content":"{{.PlainWords}}"
+  }
+{{- end -}}
+]
