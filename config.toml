@@ -1,4 +1,4 @@
-baseURL = "http://stackacademytv.github.io/JAMSite/"
+baseURL = "https://stackacademytv.github.io/JAMSite/"
 languageCode = "en-us"
 title = "JAMSite"
 theme = "tale"
